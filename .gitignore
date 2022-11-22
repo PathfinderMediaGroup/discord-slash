@@ -1,0 +1,4 @@
+/vendor/
+/.ddev/
+/.php-cs-fixer.cache
+/.idea/
