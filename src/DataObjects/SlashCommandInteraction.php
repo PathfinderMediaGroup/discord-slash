@@ -118,7 +118,7 @@ final class SlashCommandInteraction
 
     public function userIsAdmin(): bool
     {
-        return 0 !== ($this->userPermissions & 0x8);
+        return '8' === gmp_strval(gmp_and($interaction->getUserPermissions(), 0x8));
     }
 
     public function setDm(bool $isDm): self
