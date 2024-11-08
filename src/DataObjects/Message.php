@@ -26,17 +26,18 @@ final class Message implements \JsonSerializable
     private array $actionRows = [];
     private array $mentions = [];
     private bool $textOnly = false;
+    private array $textMentions = [];
 
     public function jsonSerialize(): array
     {
         return [
-            'content' => $this->content,
+            'content' => (count($this->textMentions) > 0 ? (implode(' ', array_unique($this->textMentions)).' ') : '').$this->content,
             'components' => $this->actionRows,
             'tts' => $this->tts,
             'embeds' => $this->textOnly ? [] : [[
                 'title' => $this->title,
                 'description' => $this->description,
-                'timestamp' => null === $this->timestamp ? null : $this->timestamp->format(\DateTime::ATOM),
+                'timestamp' => $this->timestamp?->format(DateTimeInterface::ATOM),
                 'url' => $this->url,
                 'color' => $this->color,
                 'author' => [
@@ -333,6 +334,18 @@ final class Message implements \JsonSerializable
     public function setTextOnly(bool $textOnly) : self
     {
         $this->textOnly = $textOnly;
+
+        return $this;
+    }
+
+    public function addTextMentions(array $userIds = [], array $roleIds = []): self
+    {
+        foreach ($userIds as $userId) {
+            $this->textMentions[] = '<@'.$userId.'>';
+        }
+        foreach ($roleIds as $roleId) {
+            $this->textMentions[] = '<@&'.$roleId.'>';
+        }
 
         return $this;
     }
