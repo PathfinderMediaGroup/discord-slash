@@ -122,4 +122,40 @@ final class SlashCommand implements DiscordComponentInterface
 
         return $this;
     }
+
+    public function addUserOption(string $name, string $description, bool $required = true): self
+    {
+        $this->options[] = [
+            'name' => $name,
+            'description' => $description,
+            'required' => $required,
+            'type' => 6,
+        ];
+
+        return $this;
+    }
+
+    public function addChannelOption(string $name, string $description, bool $required = true): self
+    {
+        $this->options[] = [
+            'name' => $name,
+            'description' => $description,
+            'required' => $required,
+            'type' => 7,
+        ];
+
+        return $this;
+    }
+
+    public function addRoleOption(string $name, string $description, bool $required = true): self
+    {
+        $this->options[] = [
+            'name' => $name,
+            'description' => $description,
+            'required' => $required,
+            'type' => 8,
+        ];
+
+        return $this;
+    }
 }
