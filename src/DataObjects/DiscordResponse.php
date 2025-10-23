@@ -68,6 +68,10 @@ class DiscordResponse implements \JsonSerializable
             return [
                 'type' => $this->type,
                 'data' => [
+                    'tss' => false,
+                    'content' => 'Thinking...',
+                    'embeds' => [],
+                    'components' => [],
                     'flags' => InteractionResponseFlags::EPHEMERAL,
                 ],
             ];
