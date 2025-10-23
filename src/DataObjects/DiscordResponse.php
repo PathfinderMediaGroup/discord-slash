@@ -41,10 +41,18 @@ class DiscordResponse implements \JsonSerializable
 
     public function jsonSerialize(): array
     {
-        if ($this->data !== null) {
+        if ($this->data instanceof Message) {
             return [
                 'type' => $this->type,
                 'data' => $this->data->jsonSerialize(),
+            ];
+        }
+        if ($this->data instanceof AutoCompleteCollection) {
+            return [
+                'type' => $this->type,
+                'data' => [
+                    'choices' => $this->data->jsonSerialize(),
+                ],
             ];
         }
 
