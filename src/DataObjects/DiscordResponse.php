@@ -10,12 +10,11 @@ use Discord\InteractionResponseType;
 class DiscordResponse implements \JsonSerializable
 {
     public function __construct(
-        private string $applicationId,
-        private string $interactionId,
-        private int $type,
-        private Message|AutoCompleteCollection|null $data = null,
-        private ?\Closure $callback = null,
-        private ?string $interactionToken = null,
+        protected string $applicationId,
+        protected string $interactionId,
+        protected int $type,
+        protected Message|AutoCompleteCollection|null $data = null,
+        protected Interaction|SlashCommandInteraction|null $interaction = null,
     ) {
     }
     public function getApplicationId(): string
@@ -38,14 +37,9 @@ class DiscordResponse implements \JsonSerializable
         return $this->data;
     }
 
-    public function getCallback(): ?\Closure
+    public function getInteraction(): Interaction|SlashCommandInteraction|null
     {
-        return $this->callback;
-    }
-
-    public function getInteractionToken(): ?string
-    {
-        return $this->interactionToken;
+        return $this->interaction;
     }
 
     public function jsonSerialize(): array

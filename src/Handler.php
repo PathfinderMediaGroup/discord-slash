@@ -10,6 +10,7 @@ use Discord\InteractionType;
 use PathfinderMediaGroup\DiscordSlash\Commands\AutoCompleteInterface;
 use PathfinderMediaGroup\DiscordSlash\Commands\InteractionInterface;
 use PathfinderMediaGroup\DiscordSlash\Commands\SlashCommandInterface;
+use PathfinderMediaGroup\DiscordSlash\DataObjects\DeferredDiscordResponse;
 use PathfinderMediaGroup\DiscordSlash\DataObjects\DiscordResponse;
 use PathfinderMediaGroup\DiscordSlash\DataObjects\SlashCommandInteraction;
 use PathfinderMediaGroup\DiscordSlash\Exceptions\InvalidInteractionTypeException;
@@ -78,7 +79,8 @@ class Handler
                     $requestData['application_id'],
                     $requestData['id'],
                     InteractionResponseType::UPDATE_MESSAGE,
-                    new $class()->interaction($interaction)
+                    new $class()->interaction($interaction),
+                    $interaction,
                 );
             }
         }
@@ -99,16 +101,15 @@ class Handler
             $class = new $class();
 
             if ($class instanceof SlashCommandInterface && $requestData['type'] === InteractionType::APPLICATION_COMMAND) {
-                $commandObject = new $class();
-
                 if (($class->deferResponse ?? false) === true) {
-                    return new DiscordResponse(
+                    return new DeferredDiscordResponse(
                         $requestData['application_id'],
                         $requestData['id'],
                         InteractionResponseType::DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
                         null,
-                        fn () => new $class()->slashCommand($interaction),
+                        $interaction,
                         $requestData['token'],
+                        $class::class,
                     );
                 }
 
@@ -117,6 +118,7 @@ class Handler
                     $requestData['id'],
                     InteractionResponseType::CHANNEL_MESSAGE_WITH_SOURCE,
                     new $class()->slashCommand($interaction),
+                    $interaction,
                 );
             } elseif ($class instanceof AutoCompleteInterface && $requestData['type'] === InteractionType::APPLICATION_COMMAND_AUTOCOMPLETE) {
                 return new DiscordResponse(
