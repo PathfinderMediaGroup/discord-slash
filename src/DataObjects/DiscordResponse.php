@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace PathfinderMediaGroup\DiscordSlash\DataObjects;
 
+use Discord\InteractionResponseFlags;
+use Discord\InteractionResponseType;
+
 class DiscordResponse implements \JsonSerializable
 {
     public function __construct(
@@ -52,6 +55,14 @@ class DiscordResponse implements \JsonSerializable
                 'type' => $this->type,
                 'data' => [
                     'choices' => $this->data->jsonSerialize(),
+                ],
+            ];
+        }
+        if ($this->type === InteractionResponseType::DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE) {
+            return [
+                'type' => $this->type,
+                'data' => [
+                    'flags' => InteractionResponseFlags::EPHEMERAL,
                 ],
             ];
         }
