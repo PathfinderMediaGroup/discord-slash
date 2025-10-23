@@ -107,7 +107,8 @@ class Handler
                         $requestData['id'],
                         InteractionResponseType::DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
                         null,
-                        fn () => new $class()->slashCommand($interaction)
+                        fn () => new $class()->slashCommand($interaction),
+                        $requestData['token'],
                     );
                 }
 

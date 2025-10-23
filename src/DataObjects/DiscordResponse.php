@@ -14,7 +14,8 @@ class DiscordResponse implements \JsonSerializable
         private string $interactionId,
         private int $type,
         private Message|AutoCompleteCollection|null $data = null,
-        private ?\Closure $callback = null
+        private ?\Closure $callback = null,
+        private ?string $interactionToken = null,
     ) {
     }
     public function getApplicationId(): string
@@ -40,6 +41,11 @@ class DiscordResponse implements \JsonSerializable
     public function getCallback(): ?\Closure
     {
         return $this->callback;
+    }
+
+    public function getInteractionToken(): ?string
+    {
+        return $this->interactionToken;
     }
 
     public function jsonSerialize(): array
