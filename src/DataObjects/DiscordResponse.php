@@ -61,13 +61,13 @@ class DiscordResponse implements \JsonSerializable
         if ($this->type === InteractionResponseType::DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE) {
             return [
                 'type' => $this->type,
-                'data' => [
-                    'tss' => false,
-                    'content' => 'Thinking...',
-                    'embeds' => [],
-                    'components' => [],
-                    'flags' => InteractionResponseFlags::EPHEMERAL,
-                ],
+//                'data' => [
+//                    'tss' => false,
+//                    'content' => 'Thinking...',
+//                    'embeds' => [],
+//                    'components' => [],
+//                    'flags' => InteractionResponseFlags::EPHEMERAL,
+//                ],
             ];
         }
 
