@@ -9,6 +9,7 @@
         }
     },
     "require": {
+        "php": "^8.4",
         "ext-gmp": "*",
         "ext-json": "*",
         "discord/interactions": "^2.2",

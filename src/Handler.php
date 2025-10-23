@@ -10,6 +10,7 @@ use Discord\InteractionType;
 use PathfinderMediaGroup\DiscordSlash\Commands\AutoCompleteInterface;
 use PathfinderMediaGroup\DiscordSlash\Commands\InteractionInterface;
 use PathfinderMediaGroup\DiscordSlash\Commands\SlashCommandInterface;
+use PathfinderMediaGroup\DiscordSlash\DataObjects\DiscordResponse;
 use PathfinderMediaGroup\DiscordSlash\DataObjects\SlashCommandInteraction;
 use PathfinderMediaGroup\DiscordSlash\Exceptions\InvalidInteractionTypeException;
 use PathfinderMediaGroup\DiscordSlash\Exceptions\UnknownApplicationException;
@@ -47,10 +48,14 @@ class Handler
         self::$applications[$applicationId] = $verificationKey;
     }
 
-    public static function handle(array $requestData): array
+    public static function handle(array $requestData): DiscordResponse
     {
         if ($requestData['type'] === InteractionType::PING) {
-            return ['type' => InteractionResponseType::PONG];
+            return new DiscordResponse(
+                $requestData['application_id'],
+                $requestData['id'],
+                InteractionResponseType::PONG
+            );
         }
 
         if ($requestData['type'] === InteractionType::MESSAGE_COMPONENT) {
@@ -69,10 +74,12 @@ class Handler
             $class = new $class();
 
             if ($class instanceof InteractionInterface) {
-                return [
-                    'type' => InteractionResponseType::UPDATE_MESSAGE,
-                    'data' => (new $class())->interaction($interaction),
-                ];
+                return new DiscordResponse(
+                    $requestData['application_id'],
+                    $requestData['id'],
+                    InteractionResponseType::UPDATE_MESSAGE,
+                    new $class()->interaction($interaction)
+                );
             }
         }
 
@@ -92,17 +99,31 @@ class Handler
             $class = new $class();
 
             if ($class instanceof SlashCommandInterface && $requestData['type'] === InteractionType::APPLICATION_COMMAND) {
-                return [
-                    'type' => InteractionResponseType::CHANNEL_MESSAGE_WITH_SOURCE,
-                    'data' => (new $class())->slashCommand($interaction),
-                ];
+                $commandObject = new $class();
+
+                if (($class->deferResponse ?? false) === true) {
+                    return new DiscordResponse(
+                        $requestData['application_id'],
+                        $requestData['id'],
+                        InteractionResponseType::DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
+                        null,
+                        fn () => new $class()->slashCommand($interaction)
+                    );
+                }
+
+                return new DiscordResponse(
+                    $requestData['application_id'],
+                    $requestData['id'],
+                    InteractionResponseType::CHANNEL_MESSAGE_WITH_SOURCE,
+                    new $class()->slashCommand($interaction),
+                );
             } elseif ($class instanceof AutoCompleteInterface && $requestData['type'] === InteractionType::APPLICATION_COMMAND_AUTOCOMPLETE) {
-                return [
-                    'type' => InteractionResponseType::APPLICATION_COMMAND_AUTOCOMPLETE_RESULT,
-                    'data' => [
-                        'choices' =>  (new $class())->autoComplete($interaction)->limit(),
-                    ],
-                ];
+                return new DiscordResponse(
+                    $requestData['application_id'],
+                    $requestData['id'],
+                    InteractionResponseType::APPLICATION_COMMAND_AUTOCOMPLETE_RESULT,
+                    new $class()->autoComplete($interaction)->limit(),
+                );
             }
         }
 
