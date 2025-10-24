@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PathfinderMediaGroup\DiscordSlash\DataObjects;
 
 use DateTimeInterface;
+use Discord\InteractionResponseFlags;
 
 final class Message implements \JsonSerializable
 {
@@ -27,6 +28,7 @@ final class Message implements \JsonSerializable
     private array $mentions = [];
     private bool $textOnly = false;
     private array $textMentions = [];
+    private ?int $flags = null;
 
     public function jsonSerialize(): array
     {
@@ -34,6 +36,7 @@ final class Message implements \JsonSerializable
             'content' => (count($this->textMentions) > 0 ? (implode(' ', array_unique($this->textMentions)).' ') : '').$this->content,
             'components' => $this->actionRows,
             'tts' => $this->tts,
+            'flags' => $this->flags,
             'embeds' => $this->textOnly ? [] : [[
                 'title' => $this->title,
                 'description' => $this->description,
@@ -334,6 +337,13 @@ final class Message implements \JsonSerializable
     public function setTextOnly(bool $textOnly) : self
     {
         $this->textOnly = $textOnly;
+
+        return $this;
+    }
+
+    public function onlyVisibleToUserWhoInvoked(): self
+    {
+        $this->flags = InteractionResponseFlags::EPHEMERAL;
 
         return $this;
     }
