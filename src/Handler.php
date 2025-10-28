@@ -79,7 +79,7 @@ class Handler
                     return new DeferredDiscordResponse(
                         $requestData['application_id'],
                         $requestData['id'],
-                        InteractionResponseType::DEFERRED_UPDATE_MESSAGE,
+                        InteractionResponseType::DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
                         null,
                         $interaction,
                         $requestData['token'],
