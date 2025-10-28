@@ -75,6 +75,18 @@ class Handler
             $class = new $class();
 
             if ($class instanceof InteractionInterface) {
+                if (($class->deferInteractionResponse ?? false) === true) {
+                    return new DeferredDiscordResponse(
+                        $requestData['application_id'],
+                        $requestData['id'],
+                        InteractionResponseType::DEFERRED_UPDATE_MESSAGE,
+                        null,
+                        $interaction,
+                        $requestData['token'],
+                        $class::class,
+                    );
+                }
+
                 return new DiscordResponse(
                     $requestData['application_id'],
                     $requestData['id'],
